@@ -1,14 +1,15 @@
-FROM golang:1.17 AS build_base
+FROM golang:1.17-alpine AS build_base
 
-WORKDIR /tmp/appgo
+WORKDIR /go/src/app
 
 COPY . .
 
-RUN go mod init main.go && \
-     go build -o ./out/appgo .
+RUN go build main.go
 
-FROM golang:1.17-alpine
+FROM scratch
 
-COPY --from=build_base /tmp/appgo/out/appgo /app/appgo
+WORKDIR /home
 
-CMD ["/app/appgo"]
+COPY --from=build_base /go/src/app/main .
+
+CMD [ "./main" ]
